@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "outDir": "dist", // 输出的目录
+    "sourceMap": true, // 采用 sourcemap
+    "target": "ES2016", // 目标语法
+    "module": "ESNext", // 模块格式
+    "moduleResolution": "Node", // 模块解析方式
+    "strict": false, // 严格模式
+    "resolveJsonModule": true, // 解析 json 模块
+    "esModuleInterop": true, // 允许通过 es6语法引入commonjs模块
+    "jsx": "preserve", // jsx 不转义
+    "lib": ["ESNext", "DOM"], // 支持的类库esnext 及 dom
+    "baseUrl": ".", // 以当前项目为根目录
+    "paths": {
+      // 这里也可以不使用这种形式，使用 pnpm install @vue/shared --filter @vue/reactivity
+      // 但是上面安装会安装 vue 官方的，
+      // 我们可以 pnpm install @vue/shared@workspace --filter @vue/reactivity
+      // 发现有可能是因为 node_modules 下有 @vue/shared 包， 所以还是需要这个配置！！！
+      "@vue/*": ["packages/*/src"]
+    }
+  }
+}

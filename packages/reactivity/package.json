@@ -1,6 +1,5 @@
 {
-  "name": "vue3-jiagou",
-  "private": true,
+  "name": "@vue/reactivity",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "typescript": "^5.2.2",
-    "vue": "^3.3.4"
+    "@vue/shared": "workspace:^"
   }
 }

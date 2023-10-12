@@ -8,9 +8,20 @@ importers:
 
   .:
     dependencies:
+      typescript:
+        specifier: ^5.2.2
+        version: 5.2.2
       vue:
         specifier: ^3.3.4
         version: 3.3.4
+
+  packages/reactivity:
+    dependencies:
+      '@vue/shared':
+        specifier: workspace:^
+        version: link:../shared
+
+  packages/shared: {}
 
 packages:
 
@@ -170,6 +181,12 @@ packages:
   /to-fast-properties@2.0.0:
     resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
     engines: {node: '>=4'}
+    dev: false
+
+  /typescript@5.2.2:
+    resolution: {integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w==}
+    engines: {node: '>=14.17'}
+    hasBin: true
     dev: false
 
   /vue@3.3.4:
