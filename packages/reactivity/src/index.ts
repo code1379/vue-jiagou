@@ -1,3 +1,5 @@
 import { isObject } from "@vue/shared";
 
-isObject({});
+export function reactive(target) {
+  console.log(target);
+}

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.ts"],
+  "sourcesContent": ["import { isObject } from \"@vue/shared\";\n\nexport function reactive(target) {\n  console.log(target);\n}\n"],
+  "mappings": ";AAEO,SAAS,SAAS,QAAQ;AAC/B,UAAQ,IAAI,MAAM;AACpB;",
+  "names": []
+}
