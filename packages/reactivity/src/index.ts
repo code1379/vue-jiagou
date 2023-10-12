@@ -1,5 +1,2 @@
-import { isObject } from "@vue/shared";
-
-export function reactive(target) {
-  console.log(target);
-}
+export * from "./effect";
+export * from "./reactive";

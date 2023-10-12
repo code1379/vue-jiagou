@@ -9,10 +9,73 @@
 
 <body>
 
-  <script type="module">
-    import { reactive } from './reactivity.js'
+  <div id="app"></div>
+  <!-- <script type="module">
 
-    console.log(reactive({}))
+    import { reactive, effect } from '../../../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js'
+
+    const state = reactive({ name: "dell", age: 18 })
+    // effect 会默认执行一次，数据变化会再执行一次（数据变化导致视图更新）
+    effect(() => {
+      app.innerHTML = state.name + state.age
+    })
+
+    setTimeout(() => {
+      state.age++
+    }, 1000)
+  </script> -->
+
+  <!-- <script type="module">
+    import { reactive, effect } from './reactivity.js'
+
+    const obj = { name: "dell", age: 18 }
+    const state1 = reactive(obj)
+    const state2 = reactive(obj)
+    // 代理后的对象传递进 reactive 中
+    const state3 = reactive(state2)
+    // state2 被劫持了，一定被添加了 get 和 set
+
+    console.log('state1 equal state2', state1 === state2)
+    console.log('state2 equal state3', state2 === state3)
+
+  </script> -->
+
+
+  <!-- <script type="module">
+    import { reactive, effect } from './reactivity.js'
+
+    const obj = { name: "dell", age: 18, gender: "1" }
+    const state = reactive(obj)
+    effect(() => { // effect1
+      app.innerHTML = state.name
+
+      effect(() => { // effect2
+        app.innerHTML = state.age
+      })
+
+      app.innerHTML = state.gender // => 现在的写法 gender 收集的是 undefined 因为 effect2 执行完 finally 会把 activeEffect 置为 undefined
+
+    })
+
+    setTimeout(() => {
+      state.name = "huangyi"
+    }, 1000)
+
+  </script> -->
+
+  <script type="module">
+    import { reactive, effect } from './reactivity.js'
+
+    const obj = { name: "dell", age: 18, gender: "1" }
+    const state = reactive(obj)
+    effect(() => { // effect1
+      app.innerHTML = state.name
+    })
+
+    setTimeout(() => {
+      state.name = "huangyi"
+    }, 1000)
+
   </script>
 </body>
 
