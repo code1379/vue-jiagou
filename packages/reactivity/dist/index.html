@@ -63,18 +63,94 @@
 
   </script> -->
 
-  <script type="module">
+  <!-- <script type="module">
     import { reactive, effect } from './reactivity.js'
 
     const obj = { name: "dell", age: 18, gender: "1" }
     const state = reactive(obj)
-    effect(() => { // effect1
+    effect(() => {
       app.innerHTML = state.name
     })
 
     setTimeout(() => {
       state.name = "huangyi"
     }, 1000)
+
+  </script> -->
+
+  <!-- <script type="module">
+    import { reactive, effect } from './reactivity.js'
+
+    const obj = { name: "dell", age: 18, gender: "1" }
+    const state = reactive(obj)
+    effect(() => {
+      // 更改之后，触发effect，然后在 effect 中又修改了值，又会触发 effect
+      state.age = Math.random()
+      app.innerHTML = state.age
+    })
+
+    setTimeout(() => {
+      state.age = 1
+    }, 1000)
+
+    /*
+      第一次修改 state.age = 1
+      触发 trigger 
+        => activeEffect = effect
+        => effect.run 执行 
+            => state.age = Math.random 触发 trigger effect 和 activeEffect 相等，不会执行 effect.run
+    */
+
+  </script> -->
+
+
+  <!-- <script type="module">
+    import { reactive, effect } from './reactivity.js'
+
+    const obj = { name: "dell", age: 18, gender: "1" }
+    const state = reactive(obj)
+    effect(() => {
+      app.innerHTML = state.age
+      effect(() => {
+        state.age = Math.random()
+        app.innerHTML = state.name
+      })
+    })
+
+    setTimeout(() => {
+      state.age = 1
+    }, 1000)
+    /*
+      name => [e1]
+      age => [e2]
+
+      age 修改，触发 trigger => e1.run() activeEffect = e1
+      感觉会生成 e3，
+        e3 => e3.run() this.parent = e1 activeEffect = e3
+              state.age = Math.random();  e1 执行
+    */
+
+  </script> -->
+
+
+  <script type="module">
+    import { reactive, effect } from './reactivity.js'
+
+    const obj = { name: "dell", age: 18, flag: true }
+    const state = reactive(obj)
+    effect(() => {
+      console.log("effect run")
+      app.innerHTML = state.flag ? state.name : state.age
+    })
+
+    setTimeout(() => {
+      state.flag = false
+      setTimeout(() => {
+        state.name = "kobe" // 不应该触发 effect
+      }, 1000)
+    }, 1000)
+
+
 
   </script>
 </body>

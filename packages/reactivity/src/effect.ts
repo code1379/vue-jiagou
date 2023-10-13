@@ -1,5 +1,15 @@
 export let activeEffect = undefined;
 
+function cleanupEffect(effect) {
+  // {name : set(effect)} 属性对应的 effect
+
+  // 找到 deps 中的 set 清理掉 effect 才可以
+  let deps = effect.deps;
+  for (let i = 0; i < deps.length; i++) {
+    deps[i].delete(effect);
+  }
+  effect.deps.length = 0;
+}
 class ReactiveEffect {
   public parent = undefined;
 
@@ -12,6 +22,8 @@ class ReactiveEffect {
     try {
       this.parent = activeEffect;
       activeEffect = this;
+
+      cleanupEffect(this);
       return this.fn(); // 触发属性的 get
     } finally {
       activeEffect = this.parent;

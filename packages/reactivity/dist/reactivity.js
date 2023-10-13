@@ -1,5 +1,12 @@
 // packages/reactivity/src/effect.ts
 var activeEffect = void 0;
+function cleanupEffect(effect2) {
+  let deps = effect2.deps;
+  for (let i = 0; i < deps.length; i++) {
+    deps[i].delete(effect2);
+  }
+  effect2.deps.length = 0;
+}
 var ReactiveEffect = class {
   // ! effect 重要记录那些属性在 effect 中调用
   constructor(fn) {
@@ -11,6 +18,7 @@ var ReactiveEffect = class {
     try {
       this.parent = activeEffect;
       activeEffect = this;
+      cleanupEffect(this);
       return this.fn();
     } finally {
       activeEffect = this.parent;
@@ -37,7 +45,12 @@ var mutableHandler = {
     return Reflect.get(target, key, receiver);
   },
   set(target, key, value, receiver) {
-    return Reflect.set(target, key, value, receiver);
+    let oldVal = target[key];
+    let flag = Reflect.set(target, key, value, receiver);
+    if (value !== oldVal) {
+      trigger(target, key, value, oldVal);
+    }
+    return flag;
   }
 };
 var targetMap = /* @__PURE__ */ new WeakMap();
@@ -56,6 +69,20 @@ function track(target, key) {
       dep.add(activeEffect);
       activeEffect.deps.push(dep);
     }
+  }
+}
+function trigger(target, key, value, oldValue) {
+  const depsMap = targetMap.get(target);
+  if (!depsMap) {
+    return;
+  }
+  const effects = depsMap.get(key);
+  if (effects) {
+    [...effects].forEach((effect2) => {
+      if (effect2 !== activeEffect) {
+        effect2.run();
+      }
+    });
   }
 }
 
