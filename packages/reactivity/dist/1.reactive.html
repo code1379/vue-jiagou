@@ -133,7 +133,7 @@
   </script> -->
 
 
-  <script type="module">
+  <!-- <script type="module">
     import { reactive, effect } from './reactivity.js'
 
     const obj = { name: "dell", age: 18, flag: true }
@@ -149,6 +149,58 @@
         state.name = "kobe" // 不应该触发 effect
       }, 1000)
     }, 1000)
+
+  </script> -->
+
+  <!-- <script type="module">
+    import { reactive, effect } from './reactivity.js'
+    // import { reactive, effect } from '../../../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js'
+
+
+    const obj = { name: "dell", age: 18, flag: true }
+    const state = reactive(obj)
+
+    // 默认每次跟心数据后都会重新执行，但是我们希望可以合并“异步更新”
+
+    let isFlushing = false
+    const runner = effect(() => {
+      console.log("runner")
+      app.innerHTML = state.name
+    }, {
+      scheduler() {
+        console.log("schedular")
+        if (!isFlushing) {
+          Promise.resolve().then(() => {
+            runner()
+            isFlushing = false
+          })
+        }
+        isFlushing = true
+      }
+    })
+
+    state.name = 1;
+    state.name = 2;
+    state.name = 3;
+
+  </script> -->
+
+
+  <script type="module">
+    import { reactive, effect } from './reactivity.js'
+    // import { reactive, effect } from '../../../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js'
+
+
+    const obj = { name: "dell", age: 18, address: { no: 2305 } }
+    const state = reactive(obj)
+
+    const runner = effect(() => {
+      app.innerHTML = state.address.no
+    })
+
+    setTimeout(() => {
+      state.address.no = 1306
+    }, 1000);
 
 
 

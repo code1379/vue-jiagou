@@ -10,11 +10,11 @@ function cleanupEffect(effect) {
   }
   effect.deps.length = 0;
 }
-class ReactiveEffect {
+export class ReactiveEffect {
   public parent = undefined;
 
   deps = []; // ! effect 重要记录那些属性在 effect 中调用
-  constructor(public fn) {}
+  constructor(public fn, public scheduler) {}
 
   run() {
     // 当运行的时候，我们需要将属性和对应的effect 关联起来
@@ -36,9 +36,12 @@ class ReactiveEffect {
 // 1:n
 // n:n
 
-export function effect(fn) {
+export function effect(fn, options: any) {
   // 将用户传递的函数，拿到变成一个响应式函数
-  const _effect = new ReactiveEffect(fn);
+  const _effect = new ReactiveEffect(fn, options?.scheduler);
   // 默认让用户的函数执行一次
   _effect.run();
+
+  const runner = _effect.run.bind(_effect);
+  return runner;
 }

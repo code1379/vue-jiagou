@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <div id="app"></div>
+  <!-- <script type="module">
+    import { reactive, effect, computed } from '../../../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js'
+
+    /*
+    计算属性特点
+    1. 不用，就不计算
+    2. 计算属性的值是同步的返回值
+    3. 依赖的值不变就不宠你想你计算
+    4. 计算属性不能修改本身的值，可以去修改其他的值
+    5. 这个可以在模板中当做数据使用
+    */
+    const obj = { firstname: "dell", lastname: "lee" }
+    const state = reactive(obj)
+
+    const fullname = computed(() => {
+      console.log("computed run")
+      return state.firstname + state.lastname
+    })
+    // => 不使用不计算
+  </script> -->
+
+  <!-- <script type="module">
+    import { reactive, effect, computed } from '../../../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js'
+
+    /*
+    计算属性特点
+    1. 不用，就不计算
+    2. 计算属性的值是同步的返回值
+    3. 依赖的值不变就不重新计算
+    4. 计算属性不能修改本身的值，可以去修改其他的值
+    5. 这个可以在模板中当做数据使用
+    */
+    const obj = { firstname: "dell", lastname: "lee" }
+    const state = reactive(obj)
+
+    const fullname = computed(() => {
+      console.log("computed run")
+      return state.firstname + state.lastname
+    })
+
+    fullname.value
+    fullname.value
+    fullname.value
+    // => 依赖值不变 依赖的值不变就不重新计算
+  </script> -->
+
+  <!-- 基本实现 -->
+  <!-- <script type="module">
+    // import { reactive, effect, computed } from '../../../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js'
+
+    import { reactive, effect, computed } from './reactivity.js'
+
+    /*
+    计算属性特点
+    1. 不用，就不计算
+    2. 计算属性的值是同步的返回值
+    3. 依赖的值不变就不重新计算
+    4. 计算属性不能修改本身的值，可以去修改其他的值
+    5. 这个可以在模板中当做数据使用
+    */
+    const obj = { firstname: "dell", lastname: "lee" }
+    const state = reactive(obj)
+
+    const fullname = computed({
+      get: () => {
+        console.log("computed run")
+        return state.firstname + state.lastname
+      },
+      set: (val) => {
+        console.log("val", val)
+      }
+    })
+
+    fullname.value = "abc" // => 赋值 不访问，也不会触发 get
+
+    // 计算属性也是一个 effect，依赖的状态会收集计算属性的 effect
+    /// 计算属性会触发它收集的 effect
+
+    effect(() => { // 计算属性也可以收集 effect
+      console.log('fullname.value', fullname.value)
+    })
+
+    setTimeout(() => {
+      state.firstname = 'xxx'
+    }, 1000);
+
+  </script> -->
+
+
+
+  <!-- 多次取值 -->
+  <script type="module">
+    // import { reactive, effect, computed } from '../../../node_modules/@vue/reactivity/dist/reactivity.esm-browser.js'
+
+    import { reactive, effect, computed } from './reactivity.js'
+
+    /*
+    计算属性特点
+    1. 不用，就不计算
+    2. 计算属性的值是同步的返回值
+    3. 依赖的值不变就不重新计算
+    4. 计算属性不能修改本身的值，可以去修改其他的值
+    5. 这个可以在模板中当做数据使用
+    */
+    const obj = { firstname: "dell", lastname: "lee" }
+    const state = reactive(obj)
+
+    const fullname = computed({
+      get: () => {
+        console.log("computed run")
+        return state.firstname + state.lastname
+      },
+      set: (val) => {
+        console.log("val", val)
+      }
+    })
+
+    fullname.value = "abc"
+
+    // 多次取值，应该不触发 get
+    effect(() => {
+      console.log('fullname.value', fullname.value)
+      console.log('fullname.value', fullname.value)
+      console.log('fullname.value', fullname.value)
+    })
+
+
+
+  </script>
+</body>
+
+</html>

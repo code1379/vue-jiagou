@@ -9,8 +9,9 @@ function cleanupEffect(effect2) {
 }
 var ReactiveEffect = class {
   // ! effect 重要记录那些属性在 effect 中调用
-  constructor(fn) {
+  constructor(fn, scheduler) {
     this.fn = fn;
+    this.scheduler = scheduler;
     this.parent = void 0;
     this.deps = [];
   }
@@ -25,14 +26,19 @@ var ReactiveEffect = class {
     }
   }
 };
-function effect(fn) {
-  const _effect = new ReactiveEffect(fn);
+function effect(fn, options) {
+  const _effect = new ReactiveEffect(fn, options?.scheduler);
   _effect.run();
+  const runner = _effect.run.bind(_effect);
+  return runner;
 }
 
 // packages/shared/src/index.ts
 function isObject(value) {
   return typeof value === "object" && value !== null;
+}
+function isFunction(value) {
+  return typeof value === "function";
 }
 
 // packages/reactivity/src/baseHandler.ts
@@ -42,7 +48,11 @@ var mutableHandler = {
       return true;
     }
     track(target, key);
-    return Reflect.get(target, key, receiver);
+    let value = Reflect.get(target, key, receiver);
+    if (isObject(value)) {
+      value = reactive(value);
+    }
+    return value;
   },
   set(target, key, value, receiver) {
     let oldVal = target[key];
@@ -64,11 +74,14 @@ function track(target, key) {
     if (!dep) {
       depsMap.set(key, dep = /* @__PURE__ */ new Set());
     }
-    let shouldTrack = !dep.has(activeEffect);
-    if (shouldTrack) {
-      dep.add(activeEffect);
-      activeEffect.deps.push(dep);
-    }
+    trackEffects(dep);
+  }
+}
+function trackEffects(dep) {
+  let shouldTrack = !dep.has(activeEffect);
+  if (shouldTrack) {
+    dep.add(activeEffect);
+    activeEffect.deps.push(dep);
   }
 }
 function trigger(target, key, value, oldValue) {
@@ -77,10 +90,17 @@ function trigger(target, key, value, oldValue) {
     return;
   }
   const effects = depsMap.get(key);
+  triggerEffects(effects);
+}
+function triggerEffects(effects) {
   if (effects) {
     [...effects].forEach((effect2) => {
       if (effect2 !== activeEffect) {
-        effect2.run();
+        if (effect2.scheduler) {
+          effect2.scheduler();
+        } else {
+          effect2.run();
+        }
       }
     });
   }
@@ -106,8 +126,55 @@ function createReactiveObject(target) {
   reactiveMap.set(target, proxy);
   return proxy;
 }
+
+// packages/reactivity/src/computed.ts
+var ComputedRefImpl = class {
+  constructor(getter, setter) {
+    this.getter = getter;
+    this.setter = setter;
+    this._dirty = true;
+    this.dep = /* @__PURE__ */ new Set();
+    this.effect = new ReactiveEffect(getter, () => {
+      if (!this._dirty) {
+        this._dirty = true;
+      }
+      triggerEffects(this.dep);
+    });
+  }
+  // * get value 收集的是 effect(() => { console.log(fullname.value)})
+  get value() {
+    if (activeEffect) {
+      trackEffects(this.dep);
+    }
+    if (this._dirty) {
+      this._dirty = false;
+      this._value = this.effect.run();
+    }
+    return this._value;
+  }
+  set value(val) {
+    this.setter(val);
+  }
+};
+function computed(getterOrOptions) {
+  let getter;
+  let setter;
+  const isGetter = isFunction(getterOrOptions);
+  if (isGetter) {
+    getter = getterOrOptions;
+    setter = () => {
+      console.warn("comnputed is readonly");
+    };
+  } else {
+    getter = getterOrOptions.get;
+    setter = getterOrOptions.set;
+  }
+  return new ComputedRefImpl(getter, setter);
+}
 export {
+  ReactiveEffect,
   activeEffect,
+  computed,
   effect,
   reactive
 };
