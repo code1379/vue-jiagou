@@ -126,6 +126,9 @@ function createReactiveObject(target) {
   reactiveMap.set(target, proxy);
   return proxy;
 }
+function isReactive(source) {
+  return !!(source && source["__v_isReactive" /* IS_REACTIVE */]);
+}
 
 // packages/reactivity/src/computed.ts
 var ComputedRefImpl = class {
@@ -171,11 +174,53 @@ function computed(getterOrOptions) {
   }
   return new ComputedRefImpl(getter, setter);
 }
+
+// packages/reactivity/src/watch.ts
+function traverse(source, seen = /* @__PURE__ */ new Set()) {
+  if (!isObject(source)) {
+    return source;
+  }
+  if (seen.has(source)) {
+    return source;
+  }
+  seen.add(source);
+  for (let k in source) {
+    traverse(source[k], seen);
+  }
+  return source;
+}
+function watch(source, cb, options = {}) {
+  let getter;
+  if (isReactive(source)) {
+    getter = () => traverse(source);
+  } else if (isFunction(source)) {
+    getter = source;
+  }
+  let oldValue;
+  let clean;
+  const onCleanUp = (fn) => {
+    clean = fn;
+  };
+  const job = () => {
+    if (clean)
+      clean();
+    const newVal = effect2.run();
+    cb(newVal, oldValue, onCleanUp);
+    oldValue = newVal;
+  };
+  const effect2 = new ReactiveEffect(getter, job);
+  if (options.immediate) {
+    job();
+  }
+  oldValue = effect2.run();
+}
 export {
   ReactiveEffect,
   activeEffect,
   computed,
   effect,
-  reactive
+  isReactive,
+  reactive,
+  watch
 };
 //# sourceMappingURL=reactivity.js.map

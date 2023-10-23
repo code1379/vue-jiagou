@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <div id="app"></div>
+  <!-- <script type="module">
+    // watch 和 computed 都是基于effect 来实现的
+    // 1. computed：目的在于计算新值，有缓存
+    // 2. watch监控属性的变化后做某一件事
+    import { reactive, effect, computed, watch } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    const obj = { firstname: "dell", lastname: "lee" }
+    const state = reactive(obj)
+
+    // watch(state, (newVal, oldVal) => {
+    //   console.log('newVal', newVal)
+    //   console.log('oldVal', oldVal)
+    // }, {
+    //   immediate: true
+    // })
+
+    watch(() => state.firstname, (newVal, oldVal) => {
+      console.log('newVal', newVal)
+      console.log('oldVal', oldVal)
+    }, {
+      immediate: true
+    })
+
+    state.firstname = "kobe"
+  </script> -->
+  <!-- <script type="module">
+    // import { reactive, effect, computed, watch } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { reactive, effect, computed, watch } from './reactivity.js'
+    const obj = { firstname: "dell", lastname: "lee" }
+    const state = reactive(obj)
+
+    // watch(state, (newVal, oldVal) => {
+    //   console.log('newVal', newVal)
+    //   console.log('oldVal', oldVal)
+    // }, {
+    //   immediate: true
+    // })
+
+    watch(() => state.firstname, (newVal, oldVal) => {
+      console.log('newVal', newVal)
+      console.log('oldVal', oldVal)
+    }, {
+      immediate: true
+    })
+
+    state.firstname = "kobe"
+  </script> -->
+
+  <!-- <script type="module">
+    // 监控输入框的变化，获取数据 显示列表 竟态问题
+    // 1  -> 3s 返回 abc
+    // 12 -> 2s 返回 bcd，当发生下一次请求操作的时候需要做一些额外的清理操作
+    // 结果返回 abc
+
+    import { reactive, effect, computed, watch } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { reactive, effect, computed, watch } from './reactivity.js'
+    const obj = { firstname: "dell", lastname: "lee", n: 0 }
+    const state = reactive(obj)
+
+    const map = {
+      1: { timer: 3000, returnVal: 'abc' },
+      2: { timer: 2000, returnVal: "bcd" }
+    }
+    function getData(newVal) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(map[newVal].returnVal)
+        }, map[newVal].timer)
+      })
+    }
+    // 默认 watchApi内部自己实现了 scheduler，我们把他改成同步了
+
+    let arr = []
+    // 闭包：生命函数的作用域和执行的上下文不是同一个
+    watch(() => state.n, async (newVal, oldVal) => {
+      console.log('newVal', newVal)
+
+      while (arr.length > 0) {
+        const fn = arr.shift()
+        fn();
+      }
+      let flag = true;
+
+      // 第二次执行的时候，将第一次的 flag 变为false
+      arr.push(function() {
+        flag = false
+      })
+      let r = await getData(newVal)
+      flag && (app.innerHTML = r)
+    }, {
+      flush: 'sync'
+    })
+
+    state.n = 1;
+    state.n = 2;
+  </script> -->
+
+
+  <!-- <script type="module">
+    // 监控输入框的变化，获取数据 显示列表 竟态问题
+    // 1  -> 3s 返回 abc
+    // 12 -> 2s 返回 bcd，当发生下一次请求操作的时候需要做一些额外的清理操作
+    // 结果返回 abc
+
+    import { reactive, effect, computed, watch } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { reactive, effect, computed, watch } from './reactivity.js'
+    const obj = { firstname: "dell", lastname: "lee", n: 0 }
+    const state = reactive(obj)
+
+    const map = {
+      1: { timer: 3000, returnVal: 'abc' },
+      2: { timer: 2000, returnVal: "bcd" }
+    }
+    function getData(newVal) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(map[newVal].returnVal)
+        }, map[newVal].timer)
+      })
+    }
+    // 默认 watchApi内部自己实现了 scheduler，我们把他改成同步了
+
+    let arr = []
+    watch(() => state.n, async (newVal, oldVal, onCleanUp) => {
+      let flag = true;
+      onCleanUp(function() {
+        flag = false
+      })
+      let r = await getData(newVal)
+      flag && (app.innerHTML = r)
+    }, {
+      flush: 'sync'
+    })
+
+    state.n = 1;
+    state.n = 2;
+  </script> -->
+
+  <script type="module">
+    // 监控输入框的变化，获取数据 显示列表 竟态问题
+    // 1  -> 3s 返回 abc
+    // 12 -> 2s 返回 bcd，当发生下一次请求操作的时候需要做一些额外的清理操作
+    // 结果返回 abc
+
+    // import { reactive, effect, computed, watch } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { reactive, effect, computed, watch } from './reactivity.js'
+    const obj = { firstname: "dell", lastname: "lee", n: 0 }
+    const state = reactive(obj)
+
+    const map = {
+      1: { timer: 3000, returnVal: 'abc' },
+      2: { timer: 2000, returnVal: "bcd" }
+    }
+    function getData(newVal) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(map[newVal].returnVal)
+        }, map[newVal].timer)
+      })
+    }
+    // 默认 watchApi内部自己实现了 scheduler，我们把他改成同步了
+
+    let arr = []
+    watch(() => state.n, async (newVal, oldVal, onCleanUp) => {
+      console.log('newVal', newVal)
+      let flag = true;
+      onCleanUp(function() {
+        flag = false
+      })
+      let r = await getData(newVal)
+      flag && (app.innerHTML = r)
+    },)
+
+    state.n = 1;
+    state.n = 2;
+  </script>
+</body>
+
+</html>

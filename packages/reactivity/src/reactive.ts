@@ -27,3 +27,7 @@ function createReactiveObject(target) {
   // 如果用同一个对象做代理，直接返回上一次的代理结果
   return proxy;
 }
+
+export function isReactive(source) {
+  return !!(source && source[ReactiveFlags.IS_REACTIVE]);
+}
