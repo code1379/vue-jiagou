@@ -22,7 +22,7 @@ function traverse(source, seen = new Set()) {
   return source;
 }
 
-export function watch(source, cb, options: any = {}) {
+function doWatch(source, cb, options) {
   let getter;
   if (isReactive(source)) {
     // getter = () => source; // => 没有收集属性
@@ -37,10 +37,14 @@ export function watch(source, cb, options: any = {}) {
     clean = fn;
   };
   const job = () => {
-    if (clean) clean();
-    const newVal = effect.run();
-    cb(newVal, oldValue, onCleanUp);
-    oldValue = newVal;
+    if (cb) {
+      if (clean) clean();
+      const newVal = effect.run();
+      cb(newVal, oldValue, onCleanUp);
+      oldValue = newVal;
+    } else {
+      effect.run();
+    }
   };
 
   const effect = new ReactiveEffect(getter, job);
@@ -50,4 +54,12 @@ export function watch(source, cb, options: any = {}) {
   }
 
   oldValue = effect.run();
+}
+
+export function watch(source, cb, options: any = {}) {
+  doWatch(source, cb, options);
+}
+
+export function watchEffect(effect, options: any = {}) {
+  doWatch(effect, null, options); // === effect
 }

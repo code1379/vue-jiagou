@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <div id="app"></div>
+
+
+  <!-- <script type="module">
+    import { ref, reactive, effect, computed, watchEffect } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { reactive, effect, computed, watchEffect } from './reactivity.js'
+    const flag = ref(true);
+    console.log('flag', flag)
+    // 修改对象
+    // 错误语法
+    // const state = reactive({ a: 1 })
+    // state = reactive({ a: 2 })
+    // 正确语法
+    // const state = ref({ a: 1 })
+    // state.value = { a: 2 }
+
+
+    // 装包
+    watchEffect(() => {
+      app.innerHTML = flag.value ? 1 : 2
+    })
+
+    setTimeout(() => {
+      flag.value = false
+    }, 1000)
+
+  </script> -->
+
+  <!-- <script type="module">
+    // import { ref, reactive, effect, computed, watchEffect } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { ref, reactive, effect, computed, watchEffect } from './reactivity.js'
+    const flag = ref(true);
+    console.log('flag', flag)
+    // 修改对象
+    // 错误语法
+    // const state = reactive({ a: 1 })
+    // state = reactive({ a: 2 })
+    // 正确语法
+    // const state = ref({ a: 1 })
+    // state.value = { a: 2 }
+
+
+    // 装包
+    watchEffect(() => {
+      app.innerHTML = flag.value ? 1 : 2
+    })
+
+    setTimeout(() => {
+      flag.value = false
+    }, 1000)
+
+  </script> -->
+
+
+
+  <!-- <script type="module">
+    // import { ref, reactive, effect, computed, watchEffect } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { ref, reactive, effect, computed, watchEffect } from './reactivity.js'
+    const state1 = reactive({ name: 'jw' })
+    const state2 = reactive({ age: 18 })
+    // 丢失响应式
+    const r = { ...state1, ...state2 }
+    // 装包
+    watchEffect(() => {
+      app.innerHTML = r.name + r.age
+    })
+
+    setTimeout(() => {
+      r.name = 'dell'
+    }, 1000)
+
+  </script> -->
+
+
+  <!-- <script type="module">
+    import { ref, reactive, effect, computed, watchEffect, } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { ref, reactive, effect, computed, watchEffect } from './reactivity.js'
+    const state1 = reactive({ name: ref("jw") })
+    const state2 = reactive({ age: ref(18) })
+    const r = { name: ref(state1.name), age: ref(state2.age) }
+    // 装包
+    watchEffect(() => {
+      app.innerHTML = r.name.value + r.age.value
+    })
+
+    setTimeout(() => {
+      r.name.value = 'dell'
+    }, 1000)
+
+  </script> -->
+
+  <!-- 
+  <script type="module">
+    // import { ref, reactive, effect, computed, watchEffect, toRef } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { ref, reactive, effect, computed, watchEffect, toRef } from './reactivity.js'
+    const state1 = reactive({ name: ref("jw") })
+    const state2 = reactive({ age: ref(18) })
+    const r = { name: toRef(state1, 'name'), age: toRef(state2, 'age') }
+    // 装包
+    watchEffect(() => {
+      app.innerHTML = r.name.value + r.age.value
+    })
+
+    setTimeout(() => {
+      r.name.value = 'dell'
+    }, 1000)
+
+  </script> -->
+
+
+  <script type="module">
+    import { ref, reactive, effect, computed, watchEffect, toRefs } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { ref, reactive, effect, computed, watchEffect, toRef } from './reactivity.js'
+    const state1 = reactive({ name: ref("jw") })
+    const state2 = reactive({ age: ref(18) })
+    const r = { ...toRefs(state1), ...toRefs(state2) }
+    // 装包
+    watchEffect(() => {
+      app.innerHTML = r.name.value + r.age.value
+    })
+
+    setTimeout(() => {
+      r.name.value = 'dell'
+    }, 1000)
+
+  </script>
+
+</body>
+
+</html>

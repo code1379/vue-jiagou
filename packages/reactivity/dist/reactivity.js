@@ -129,6 +129,9 @@ function createReactiveObject(target) {
 function isReactive(source) {
   return !!(source && source["__v_isReactive" /* IS_REACTIVE */]);
 }
+function toReactive(source) {
+  return isObject(source) ? reactive(source) : source;
+}
 
 // packages/reactivity/src/computed.ts
 var ComputedRefImpl = class {
@@ -189,7 +192,7 @@ function traverse(source, seen = /* @__PURE__ */ new Set()) {
   }
   return source;
 }
-function watch(source, cb, options = {}) {
+function doWatch(source, cb, options) {
   let getter;
   if (isReactive(source)) {
     getter = () => traverse(source);
@@ -202,17 +205,74 @@ function watch(source, cb, options = {}) {
     clean = fn;
   };
   const job = () => {
-    if (clean)
-      clean();
-    const newVal = effect2.run();
-    cb(newVal, oldValue, onCleanUp);
-    oldValue = newVal;
+    if (cb) {
+      if (clean)
+        clean();
+      const newVal = effect2.run();
+      cb(newVal, oldValue, onCleanUp);
+      oldValue = newVal;
+    } else {
+      effect2.run();
+    }
   };
   const effect2 = new ReactiveEffect(getter, job);
   if (options.immediate) {
     job();
   }
   oldValue = effect2.run();
+}
+function watch(source, cb, options = {}) {
+  doWatch(source, cb, options);
+}
+function watchEffect(effect2, options = {}) {
+  doWatch(effect2, null, options);
+}
+
+// packages/reactivity/src/ref.ts
+function ref(value) {
+  return new RefImpl(value);
+}
+var RefImpl = class {
+  constructor(rawValue) {
+    this.rawValue = rawValue;
+    this.dep = /* @__PURE__ */ new Set();
+    this._value = toReactive(rawValue);
+  }
+  get value() {
+    if (activeEffect) {
+      trackEffects(this.dep);
+    }
+    return this._value;
+  }
+  set value(newVal) {
+    if (newVal !== this.rawValue) {
+      this.rawValue = newVal;
+      this._value = toReactive(newVal);
+      triggerEffects(this.dep);
+    }
+  }
+};
+var ObjectRefImpl = class {
+  constructor(object, key) {
+    this.object = object;
+    this.key = key;
+  }
+  get value() {
+    return this.object[this.key];
+  }
+  set value(newVal) {
+    this.object[this.key] = newVal;
+  }
+};
+function toRef(object, key) {
+  return new ObjectRefImpl(object, key);
+}
+function toRefs(object) {
+  let res = {};
+  for (let key in object) {
+    res[key] = toRef(object, key);
+  }
+  return res;
 }
 export {
   ReactiveEffect,
@@ -221,6 +281,11 @@ export {
   effect,
   isReactive,
   reactive,
-  watch
+  ref,
+  toReactive,
+  toRef,
+  toRefs,
+  watch,
+  watchEffect
 };
 //# sourceMappingURL=reactivity.js.map
