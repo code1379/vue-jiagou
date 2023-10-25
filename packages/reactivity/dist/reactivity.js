@@ -1,3 +1,47 @@
+// packages/reactivity/src/effectScope.ts
+var activeEffectScope;
+var EffectScope = class {
+  // 父亲用于存储儿子的 effectScope
+  constructor(detached) {
+    this.effects = [];
+    this.parent = null;
+    this.scopes = [];
+    if (!detached && activeEffectScope) {
+      activeEffectScope.scopes.push(this);
+    }
+  }
+  run(fn) {
+    try {
+      this.parent = activeEffectScope;
+      activeEffectScope = this;
+      return fn();
+    } finally {
+      activeEffectScope = this.parent;
+      this.parent = null;
+    }
+  }
+  stop() {
+    for (let i = 0; i < this.effects.length; i++) {
+      const effect2 = this.effects[i];
+      effect2.stop();
+    }
+    if (this.scopes.length) {
+      for (let i = 0; i < this.scopes.length; i++) {
+        const effect2 = this.scopes[i];
+        effect2.stop();
+      }
+    }
+  }
+};
+function recordEffectScope(effect2) {
+  if (activeEffectScope) {
+    activeEffectScope.effects.push(effect2);
+  }
+}
+function effectScope(detached = false) {
+  return new EffectScope(detached);
+}
+
 // packages/reactivity/src/effect.ts
 var activeEffect = void 0;
 function cleanupEffect(effect2) {
@@ -13,9 +57,14 @@ var ReactiveEffect = class {
     this.fn = fn;
     this.scheduler = scheduler;
     this.parent = void 0;
+    this.active = true;
     this.deps = [];
+    recordEffectScope(this);
   }
   run() {
+    if (!this.active) {
+      return this.fn();
+    }
     try {
       this.parent = activeEffect;
       activeEffect = this;
@@ -25,11 +74,18 @@ var ReactiveEffect = class {
       activeEffect = this.parent;
     }
   }
+  stop() {
+    if (this.active) {
+      this.active = false;
+      cleanupEffect(this);
+    }
+  }
 };
 function effect(fn, options) {
   const _effect = new ReactiveEffect(fn, options?.scheduler);
   _effect.run();
   const runner = _effect.run.bind(_effect);
+  runner.effect = _effect;
   return runner;
 }
 
@@ -296,11 +352,14 @@ function proxyRefs(target) {
 export {
   ReactiveEffect,
   activeEffect,
+  activeEffectScope,
   computed,
   effect,
+  effectScope,
   isReactive,
   proxyRefs,
   reactive,
+  recordEffectScope,
   ref,
   toReactive,
   toRef,

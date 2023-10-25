@@ -1,3 +1,5 @@
+import { recordEffectScope } from "./effectScope";
+
 export let activeEffect = undefined;
 
 function cleanupEffect(effect) {
@@ -12,11 +14,16 @@ function cleanupEffect(effect) {
 }
 export class ReactiveEffect {
   public parent = undefined;
-
+  active = true;
   deps = []; // ! effect 重要记录那些属性在 effect 中调用
-  constructor(public fn, public scheduler) {}
+  constructor(public fn, public scheduler) {
+    recordEffectScope(this);
+  }
 
   run() {
+    if (!this.active) {
+      return this.fn();
+    }
     // 当运行的时候，我们需要将属性和对应的effect 关联起来
     // 利用js是单线程的特性，先放在全局，再取值
     try {
@@ -27,6 +34,13 @@ export class ReactiveEffect {
       return this.fn(); // 触发属性的 get
     } finally {
       activeEffect = this.parent;
+    }
+  }
+
+  stop() {
+    if (this.active) {
+      this.active = false;
+      cleanupEffect(this);
     }
   }
 }
@@ -43,5 +57,6 @@ export function effect(fn, options: any) {
   _effect.run();
 
   const runner = _effect.run.bind(_effect);
+  runner.effect = _effect;
   return runner;
 }

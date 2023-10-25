@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <div id="app"></div>
+  <!-- <script type="module">
+    import { effectScope, ref, reactive, effect, computed, watchEffect, toRefs } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { ref, reactive, effect, computed, watchEffect, toRef } from './reactivity.js'
+
+    // const scope = effectScope()
+
+    // scope.run(() => {
+    //   const val = ref("abc")
+    //   effect(() => {
+    //     console.log(val.value)
+    //   })
+    //   effect(() => {
+    //     console.log(val.value)
+    //   })
+    //   setTimeout(() => {
+    //     val.value = "cba"
+    //   }, 1000)
+    // })
+
+    // scope.stop()
+
+    const val = ref("abc")
+    const runner = effect(() => {
+      console.log(val.value)
+    })
+
+
+    runner.effect.stop()
+    val.value = "bcd"
+  </script> -->
+
+
+  <!-- <script type="module">
+    import { effectScope, ref, reactive, effect, computed, watchEffect, toRefs } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { ref, reactive, effect, computed, watchEffect, toRef } from './reactivity.js'
+
+    const scope = effectScope(); // 依赖收集
+    console.log('scope', scope)
+    scope.run(() => {
+      const val = ref("abc")
+      effect(() => {
+        console.log(val.value)
+      })
+      effect(() => {
+        console.log(val.value)
+      })
+      setTimeout(() => {
+        val.value = "cba"
+      }, 1000)
+    })
+
+    scope.stop()
+  </script> -->
+
+
+  <!-- <script type="module">
+    import { effectScope, ref, reactive, effect, computed, watchEffect, toRefs } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { ref, reactive, effect, computed, watchEffect, toRef } from './reactivity.js'
+
+    const scope = effectScope(); // 依赖收集
+    console.log('scope', scope)
+    scope.run(() => {
+      const val = ref("abc")
+      effect(() => {
+        console.log(val.value)
+      })
+      effect(() => {
+        console.log(val.value)
+      })
+      setTimeout(() => {
+        val.value = "cba"
+      }, 1000)
+
+
+      const innerScop = effectScope(); // 依赖收集
+      console.log('innerScop', innerScop)
+      innerScop.run(() => {
+        const val = ref("bbb")
+        effect(() => {
+          console.log(val.value)
+        })
+        effect(() => {
+          console.log(val.value)
+        })
+        setTimeout(() => {
+          val.value = "ccc"
+        }, 1000)
+      })
+
+      // innerScop.stop()
+    })
+
+    scope.stop()
+  </script> -->
+
+
+
+  <script type="module">
+    import { effectScope, ref, reactive, effect, computed, watchEffect, toRefs } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { ref, reactive, effect, computed, watchEffect, toRef } from './reactivity.js'
+
+    const scope = effectScope(); // 依赖收集
+    console.log('scope', scope)
+    scope.run(() => {
+      const val = ref("abc")
+      effect(() => {
+        console.log(val.value)
+      })
+      effect(() => {
+        console.log(val.value)
+      })
+      setTimeout(() => {
+        val.value = "cba"
+      }, 1000)
+
+
+      const innerScop = effectScope(true); // 依赖收集
+      console.log('innerScop', innerScop)
+      innerScop.run(() => {
+        const val = ref("bbb")
+        effect(() => {
+          console.log(val.value)
+        })
+        effect(() => {
+          console.log(val.value)
+        })
+        setTimeout(() => {
+          val.value = "ccc"
+        }, 1000)
+      })
+
+      // innerScop.stop()
+    })
+
+    scope.stop()
+  </script>
+</body>
+
+</html>
