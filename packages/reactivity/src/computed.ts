@@ -6,6 +6,7 @@ class ComputedRefImpl {
   _value;
   _dirty = true;
   dep = new Set();
+  __v_isRef = true;
   constructor(public getter, public setter) {
     // 计算属性就是一个 effect 会让 getter 中的属性收集这个 effect
     this.effect = new ReactiveEffect(getter, () => {

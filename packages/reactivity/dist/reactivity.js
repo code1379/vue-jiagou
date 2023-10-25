@@ -140,6 +140,7 @@ var ComputedRefImpl = class {
     this.setter = setter;
     this._dirty = true;
     this.dep = /* @__PURE__ */ new Set();
+    this.__v_isRef = true;
     this.effect = new ReactiveEffect(getter, () => {
       if (!this._dirty) {
         this._dirty = true;
@@ -235,6 +236,7 @@ function ref(value) {
 var RefImpl = class {
   constructor(rawValue) {
     this.rawValue = rawValue;
+    this.__v_isRef = true;
     this.dep = /* @__PURE__ */ new Set();
     this._value = toReactive(rawValue);
   }
@@ -256,6 +258,7 @@ var ObjectRefImpl = class {
   constructor(object, key) {
     this.object = object;
     this.key = key;
+    this.__v_isRef = true;
   }
   get value() {
     return this.object[this.key];
@@ -274,12 +277,29 @@ function toRefs(object) {
   }
   return res;
 }
+function proxyRefs(target) {
+  return new Proxy(target, {
+    get(target2, key, receiver) {
+      let r = Reflect.get(target2, key, receiver);
+      return r.__v_isRef ? r.value : r;
+    },
+    set(target2, key, value, receiver) {
+      const oldVal = target2[key];
+      if (oldVal.__v_isRef) {
+        oldVal.value = value;
+      } else {
+        return Reflect.set(target2, key, value, receiver);
+      }
+    }
+  });
+}
 export {
   ReactiveEffect,
   activeEffect,
   computed,
   effect,
   isReactive,
+  proxyRefs,
   reactive,
   ref,
   toReactive,

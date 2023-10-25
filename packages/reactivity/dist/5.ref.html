@@ -119,7 +119,7 @@
   </script> -->
 
 
-  <script type="module">
+  <!-- <script type="module">
     import { ref, reactive, effect, computed, watchEffect, toRefs } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
     // import { ref, reactive, effect, computed, watchEffect, toRef } from './reactivity.js'
     const state1 = reactive({ name: ref("jw") })
@@ -132,6 +132,24 @@
 
     setTimeout(() => {
       r.name.value = 'dell'
+    }, 1000)
+
+  </script> -->
+
+
+  <script type="module">
+    import { proxyRefs, ref, reactive, effect, computed, watchEffect, toRefs } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { ref, reactive, effect, computed, watchEffect, toRef } from './reactivity.js'
+    const state1 = reactive({ name: ref("jw") })
+    const state2 = reactive({ age: ref(18) })
+    const r = proxyRefs({ ...toRefs(state1), ...toRefs(state2) })
+    // 装包
+    watchEffect(() => {
+      app.innerHTML = r.name + r.age
+    })
+
+    setTimeout(() => {
+      r.name = 'dell'
     }, 1000)
 
   </script>
