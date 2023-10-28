@@ -47,8 +47,109 @@
     render(VDom, app)
   </script> -->
 
-  <script type="module">
+  <!-- <script type="module">
     import "./runtime-dom.js"
+  </script> -->
+
+  <!-- <script type="module">
+    // vue 在 runtime-dom 中提供了一个方法，这个方法运行用户自定义的渲染方式
+    // mpvue 基于 vue 源码进行改造
+    // 针对 canvas 来进行渲染，自己定义渲染方式
+    import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    // import { createRenderer, h, render } from './runtime-dom.js'
+
+    // 虚拟DOM，好处就是跨平台 {div, 属性，内容是什么} 可以做diff 肃反
+    // 我们的核心就是利用渲染器来渲染我们的虚拟DOM
+
+    const vnode1 = h("div")
+    console.log('vnode1', vnode1)
+
+    const vnode2 = h("div", h("span"))
+    console.log('vnode2', vnode2)
+
+    const vnode3 = h("div", { color: "red" })
+    console.log('vnode3', vnode3)
+
+    const vnode4 = h("div", [h("span"), h("span")])
+    console.log('vnode4', vnode4)
+
+    const vnode5 = h("div", {}, [h("span"), h("span")])
+    console.log('vnode5', vnode5)
+
+    const vnode6 = h("div", {}, h("span"), h("span"))
+    console.log('vnode6', vnode6)
+
+    // const vnode7 = h("div", h("span"), h("span")) // ❌ 写法 不推荐
+    // console.log('vnode7', vnode7)
+  </script> -->
+
+  <!-- <script type="module">
+    // vue 在 runtime-dom 中提供了一个方法，这个方法运行用户自定义的渲染方式
+    // mpvue 基于 vue 源码进行改造
+    // 针对 canvas 来进行渲染，自己定义渲染方式
+    // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { createRenderer, h, render } from './runtime-dom.js'
+
+    // 虚拟DOM，好处就是跨平台 {div, 属性，内容是什么} 可以做diff 肃反
+    // 我们的核心就是利用渲染器来渲染我们的虚拟DOM
+
+    const VDom = h("div", 'hello')
+    render(VDom, app)
+  </script> -->
+
+
+  <!-- <script type="module">
+    // vue 在 runtime-dom 中提供了一个方法，这个方法运行用户自定义的渲染方式
+    // mpvue 基于 vue 源码进行改造
+    // 针对 canvas 来进行渲染，自己定义渲染方式
+    // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { createRenderer, h, render } from './runtime-dom.js'
+
+    // 虚拟DOM，好处就是跨平台 {div, 属性，内容是什么} 可以做diff 肃反
+    // 我们的核心就是利用渲染器来渲染我们的虚拟DOM
+
+    const vnode1 = h("div")
+    console.log('vnode1', vnode1)
+
+    const vnode2 = h("div", h("span"))
+    console.log('vnode2', vnode2)
+
+    const vnode3 = h("div", { color: "red" })
+    console.log('vnode3', vnode3)
+
+    const vnode4 = h("div", [h("span"), h("span")])
+    console.log('vnode4', vnode4)
+
+    const vnode5 = h("div", {}, [h("span"), h("span")])
+    console.log('vnode5', vnode5)
+
+    const vnode6 = h("div", {}, h("span"), h("span"))
+    console.log('vnode6', vnode6)
+
+    const vnode7 = h("div", 'hello')
+    console.log('vnode7', vnode7)
+
+  </script> -->
+
+  <script type="module">
+    // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { createRenderer, h, render } from './runtime-dom.js'
+
+
+
+    // const vnode3 = h("div", { style: { color: "red" } }, 'hello')
+    // console.log('vnode3', vnode3)
+    // render(vnode3, app)
+
+    // const vnode4 = h("div", [h("span", 't1'), h("span", 't2')])
+    // console.log('vnode4', vnode4)
+    // render(vnode4, app)
+
+    // 这种情况我们代码里没处理，暂不考虑
+    const node5 = h("div", ['tt1', 'tt2'])
+    console.log('node5', node5)
+    render(node5, app)
+
   </script>
 </body>
 
