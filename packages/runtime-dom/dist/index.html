@@ -131,7 +131,7 @@
 
   </script> -->
 
-  <script type="module">
+  <!-- <script type="module">
     // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
     import { createRenderer, h, render } from './runtime-dom.js'
 
@@ -146,10 +146,55 @@
     // render(vnode4, app)
 
     // 这种情况我们代码里没处理，暂不考虑
-    const node5 = h("div", ['tt1', 'tt2'])
-    console.log('node5', node5)
-    render(node5, app)
+    // const node5 = h("div", ['tt1', 'tt2'])
+    // console.log('node5', node5)
+    // render(node5, app)
 
+    const vdom = h("div", { style: { background: 'red' } }, [h("span", 'hello')])
+    render(vdom, app)
+
+  </script> -->
+
+
+  <!-- 卸载 -->
+  <!-- <script type="module">
+    // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { createRenderer, h, render } from './runtime-dom.js'
+
+    const vdom = h("div", { style: { background: 'red' } }, [h("span", 'hello')])
+    render(vdom, app)
+    setTimeout(() => {
+      render(null, app)
+    }, 1000)
+  </script> -->
+
+  <!-- 更新 -->
+  <!-- <script type="module">
+    // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { createRenderer, h, render } from './runtime-dom.js'
+
+    const vdom1 = h("div", { style: { background: 'red' }, key: 1 }, [h("span", 'hello')])
+    const vdom2 = h("p", { style: { background: 'red' }, key: 2 }, [h("span", 'hello')])
+
+    // diff 算法1：平级比较 type 不同 直接删掉重建。 父节点都不是同一个了，下面的就都不复用了
+    render(vdom1, app)
+    setTimeout(() => {
+      render(vdom2, app)
+    }, 1000)
+  </script> -->
+  <!-- 更新 -->
+  <script type="module">
+    // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { createRenderer, h, render } from './runtime-dom.js'
+
+    const vdom1 = h("div", { style: { background: 'red' }, }, [h("span", 'hello')])
+    const vdom2 = h("div", { style: { color: 'blue' }, }, [h("span", 'hello')])
+
+    // diff 算法1：平级比较 type 不同 直接删掉重建。 父节点都不是同一个了，下面的就都不复用了
+    render(vdom1, app)
+    setTimeout(() => {
+      render(vdom2, app)
+    }, 1000)
   </script>
 </body>
 

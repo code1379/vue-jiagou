@@ -3,7 +3,7 @@ function patchStyle(el, prevValue, nextValue) {
   const style = el["style"];
   if (nextValue) {
     for (let key in nextValue) {
-      style[key] = nextValue(key);
+      style[key] = nextValue[key];
     }
   }
 
