@@ -34,7 +34,7 @@ export function createRenderer(options) {
       unmount(children[i]);
     }
   };
-  const mountElement = (vnode, container) => {
+  const mountElement = (vnode, container, anchor) => {
     const { type, props, shapeFlag, children } = vnode;
     // 先创建父元素
     let el = (vnode.el = hostCreateElement(type));
@@ -54,7 +54,7 @@ export function createRenderer(options) {
       hostSetElementText(el, children);
     }
     //  将元素插入到父级中
-    hostInsert(el, container);
+    hostInsert(el, container, anchor);
   };
 
   const patchProps = (oldProps, newProps, el) => {
@@ -70,12 +70,115 @@ export function createRenderer(options) {
     }
   };
 
+  // 比较 children
+  const patchKeyedChildren = (c1, c2, el) => {
+    // 有优化的点
+    // dom操作常见的方式 1. 前后增加 前后删除
+    // 如果不优化，就比较 c1 c2 的差异循环即可
+
+    // 第一种
+    // a, b, c
+    // a, b, c, d
+    // from start
+
+    // 第二种
+    // a, b, c
+    // d, a, b, c
+    // from end
+
+    // a, b, c
+    // a, e
+
+    let i = 0; // 头部索引
+    let e1 = c1.length - 1;
+    let e2 = c2.length - 1;
+
+    // 例子1
+    // a, b, c
+    // a, b, c, d
+    // e1 = 2 e2 = 3
+    // 循环结束 i = 2 (+了 1 是 3)
+
+    // 如果是下面的 a,b,c -> d,a,b,c 会直接 break 所以 i = 0
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[i];
+      const n2 = c2[i];
+      if (isSameVNode(n1, n2)) {
+        patch(n1, n2, el);
+      } else {
+        break;
+      }
+      i++;
+    }
+    console.log(i, e1, e2); // 3 2 3
+
+    // 例子2
+    // a, b, c
+    // d, a, b, c 倒序比较
+
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[e1];
+      const n2 = c2[e2];
+      if (isSameVNode(n1, n2)) {
+        patch(n1, n2, el);
+      } else {
+        break;
+      }
+      e2--;
+      e1--;
+    }
+
+    console.log(i, e1, e2); // 0 -1 0
+
+    // 新的比老的多？我是如何知道的呢？
+    // i > e1 说明新的比老的长，有新增的逻辑
+    if (i > e1) {
+      if (i <= e2) {
+        // 说明 i - e2 之间是新增的部分
+        while (i <= e2) {
+          // 如果 e2 后面没有值，说明往后插入
+          // 如果 e2 后面有值，说明往前比较的，肯定是向前插入
+          const nextPos = e2 + 1;
+          const anchor = c2[nextPos]?.el;
+          patch(null, c2[i], el, anchor);
+          i++;
+        }
+      }
+    } else if (i > e2) {
+      // 老的多 新的少
+      // 例子 3
+      // a, b, c, d, e
+      // a, b, c
+      // (i, e1, e2) 3 4 2
+      // d, e, a, b, c
+      // a, b, c
+      // (i, e1, e2) 0, 1, -1
+
+      while (i <= e1) {
+        // 如果 e2 后面没有值，说明往后插入
+        // 如果 e2 后面有值，说明往前比较的，肯定是向前插入
+        unmount(c1[i]);
+        i++;
+      }
+    }
+
+    // a b c d e h q f g
+    // a b c m n   q f g
+    // i = 0 e1 = 8 e2= 7
+    // => from start
+    // i = 3, e1 = 8, e2 =7
+    // => from end 此时 i = 3
+    // i = 3, e1 = 8, e2=7
+    // i = 3, el = 5, e2 = 4
+    // 3- 5 和 3-4 进行比较
+  };
+
   const patchChildren = (n1, n2, el) => {
     // 比较前后2个节点的差异
     let c1 = n1.children;
     let c2 = n2.children;
     let prevShapeFlag = n1.shapeFlag; // 上一次的
-    let currentShapeFlag = n2.shapeFlag; // 新的
+    let shapeFlag = n2.shapeFlag; // 新的
     // 文本 数组 空  9种
     // 文本 - 数组  文本删除掉，换成数组
     // 文本 - 空    清空文本
@@ -90,7 +193,7 @@ export function createRenderer(options) {
     //     - 空   无需处理
 
     // 新的文本
-    if (currentShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
       // 旧的数组
       if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
         unmountChildren(c1);
@@ -103,19 +206,22 @@ export function createRenderer(options) {
     } else {
       // 新的数组和 null 的情况
       if (prevShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-        if (currentShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+          // 之前是数组，新的也是数组
           // diff 算法
+          console.log("diff");
+          patchKeyedChildren(c1, c2, el);
         } else {
-          //! 老的是数组，新的是空 (新的是文本 已经在上面处理过了)
+          // * 之前是数组，新的是空 （新的是文本在上面已经处理过了）
           unmountChildren(c1);
         }
       } else {
-        // 旧的是文本
+        // 之前是文本
         if (prevShapeFlag & ShapeFlags.TEXT_CHILDREN) {
           hostSetElementText(el, "");
         }
         // 本次是数组，则直接挂载即可
-        if (currentShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
           mountChildren(c2, el);
         }
       }
@@ -129,7 +235,7 @@ export function createRenderer(options) {
   };
 
   // patch 方法每次更细你都会重新执行
-  const patch = (n1, n2, container) => {
+  const patch = (n1, n2, container, anchor = null) => {
     // 1. 判断 n1 和 n2 是不是相同的节点，如果不是相同节点直接删掉换新的
     // ! 为什么不把这段逻辑写到 patchElement 里呢？ 因为要把 n1 置为 null
     if (n1 && !isSameVNode(n1, n2)) {
@@ -138,7 +244,7 @@ export function createRenderer(options) {
     }
     if (n1 == null) {
       // 初始化逻辑
-      mountElement(n2, container);
+      mountElement(n2, container, anchor);
     } else {
       patchElement(n1, n2, container);
     }

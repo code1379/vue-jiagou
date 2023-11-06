@@ -183,7 +183,7 @@
     }, 1000)
   </script> -->
   <!-- 更新 -->
-  <script type="module">
+  <!-- <script type="module">
     // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
     import { createRenderer, h, render } from './runtime-dom.js'
 
@@ -195,7 +195,39 @@
     setTimeout(() => {
       render(vdom2, app)
     }, 1000)
+  </script> -->
+  <!-- diff 算法 -->
+  <script type="module">
+    // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
+    import { createRenderer, h, render } from './runtime-dom.js'
+
+    const vdom1 = h("div", { key: "1" }, [
+      h("span", { key: "a" }, 'a'),
+      h("span", { key: "b" }, 'b'),
+      h("span", { key: "c" }, 'c')])
+    // const vdom2 = h("div", { key: "1" }, [
+    //   h("span", { key: "a" }, 'a'),
+    //   h("span", { key: "b" }, 'b'),
+    //   h("span", { key: "c" }, 'c'),
+    //   h("span", { key: "d" }, 'd')])
+    const vdom2 = h("div", { key: "1" }, [
+      h("span", { key: "d" }, 'd'),
+      h("span", { key: "e" }, 'e'),
+      h("span", { key: "a" }, 'a'),
+      h("span", { key: "b" }, 'b'),
+      h("span", { key: "c" }, 'c'),
+    ])
+
+
+
+    // diff 算法1：平级比较 type 不同 直接删掉重建。 父节点都不是同一个了，下面的就都不复用了
+    render(vdom1, app)
+    setTimeout(() => {
+      render(vdom2, app)
+    }, 1000)
   </script>
+
+
 </body>
 
 </html>

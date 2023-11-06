@@ -158,7 +158,7 @@ function createRenderer(options) {
       unmount(children[i]);
     }
   };
-  const mountElement = (vnode, container) => {
+  const mountElement = (vnode, container, anchor) => {
     const { type, props, shapeFlag, children } = vnode;
     let el = vnode.el = hostCreateElement(type);
     if (props) {
@@ -171,7 +171,7 @@ function createRenderer(options) {
     } else {
       hostSetElementText(el, children);
     }
-    hostInsert(el, container);
+    hostInsert(el, container, anchor);
   };
   const patchProps = (oldProps, newProps, el) => {
     for (let key in newProps) {
@@ -183,12 +183,55 @@ function createRenderer(options) {
       }
     }
   };
+  const patchKeyedChildren = (c1, c2, el) => {
+    let i = 0;
+    let e1 = c1.length - 1;
+    let e2 = c2.length - 1;
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[i];
+      const n2 = c2[i];
+      if (isSameVNode(n1, n2)) {
+        patch(n1, n2, el);
+      } else {
+        break;
+      }
+      i++;
+    }
+    console.log(i, e1, e2);
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[e1];
+      const n2 = c2[e2];
+      if (isSameVNode(n1, n2)) {
+        patch(n1, n2, el);
+      } else {
+        break;
+      }
+      e2--;
+      e1--;
+    }
+    console.log(i, e1, e2);
+    if (i > e1) {
+      if (i <= e2) {
+        while (i <= e2) {
+          const nextPos = e2 + 1;
+          const anchor = c2[nextPos]?.el;
+          patch(null, c2[i], el, anchor);
+          i++;
+        }
+      }
+    } else if (i > e2) {
+      while (i <= e1) {
+        unmount(c1[i]);
+        i++;
+      }
+    }
+  };
   const patchChildren = (n1, n2, el) => {
     let c1 = n1.children;
     let c2 = n2.children;
     let prevShapeFlag = n1.shapeFlag;
-    let currentShapeFlag = n2.shapeFlag;
-    if (currentShapeFlag & 8 /* TEXT_CHILDREN */) {
+    let shapeFlag = n2.shapeFlag;
+    if (shapeFlag & 8 /* TEXT_CHILDREN */) {
       if (prevShapeFlag & 16 /* ARRAY_CHILDREN */) {
         unmountChildren(c1);
       }
@@ -197,7 +240,9 @@ function createRenderer(options) {
       }
     } else {
       if (prevShapeFlag & 16 /* ARRAY_CHILDREN */) {
-        if (currentShapeFlag & 16 /* ARRAY_CHILDREN */) {
+        if (shapeFlag & 16 /* ARRAY_CHILDREN */) {
+          console.log("diff");
+          patchKeyedChildren(c1, c2, el);
         } else {
           unmountChildren(c1);
         }
@@ -205,7 +250,7 @@ function createRenderer(options) {
         if (prevShapeFlag & 8 /* TEXT_CHILDREN */) {
           hostSetElementText(el, "");
         }
-        if (currentShapeFlag & 16 /* ARRAY_CHILDREN */) {
+        if (shapeFlag & 16 /* ARRAY_CHILDREN */) {
           mountChildren(c2, el);
         }
       }
@@ -216,13 +261,13 @@ function createRenderer(options) {
     patchProps(n1.props, n2.props, el);
     patchChildren(n1, n2, el);
   };
-  const patch = (n1, n2, container) => {
+  const patch = (n1, n2, container, anchor = null) => {
     if (n1 && !isSameVNode(n1, n2)) {
       unmount(n1);
       n1 = null;
     }
     if (n1 == null) {
-      mountElement(n2, container);
+      mountElement(n2, container, anchor);
     } else {
       patchElement(n1, n2, container);
     }
@@ -276,5 +321,4 @@ export {
   h,
   render
 };
-//! 老的是数组，新的是空 (新的是文本 已经在上面处理过了)
 //# sourceMappingURL=runtime-dom.js.map
